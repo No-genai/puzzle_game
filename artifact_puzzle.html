@@ -1,177 +1,278 @@
 <title>しゃしんパズル</title>
 <style>
   :root {
-    --bg: #fff8e6;
-    --card: #ffffff;
-    --accent: #ff7a59;
-    --accent2: #4ac0ff;
-    --yellow: #ffd54a;
-    --green: #57cc66;
-    --ink: #4a3f35;
-    --muted: #9b8e80;
-    --shadow: 0 6px 0 rgba(0,0,0,.12);
+    --paper:    #ece3d2;
+    --paper-2:  #e4d9c4;
+    --surface:  #fbf7ef;
+    --surface-sunk: #e7ddca;
+    --ink:      #33302c;
+    --ink-soft: #6c6456;
+    --muted:    #9a9081;
+    --line:     rgba(51,48,44,.10);
+    --amber:    #f0a92b;
+    --amber-ink:#7a4e00;
+    --teal:     #2f8f83;
+    --teal-dark:#267469;
+    --berry:    #d8567a;
+    --sage:     #8ba86a;
+    --shadow-sm: 0 1px 2px rgba(51,48,44,.08), 0 2px 6px rgba(51,48,44,.06);
+    --shadow-md: 0 2px 4px rgba(51,48,44,.08), 0 10px 24px rgba(51,48,44,.10);
+    --shadow-lg: 0 6px 14px rgba(51,48,44,.10), 0 22px 48px rgba(51,48,44,.16);
+    --radius: 20px;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
     margin: 0; padding: 0;
     font-family: "Hiragino Maru Gothic ProN", "Rounded Mplus 1c", "Yu Gothic", system-ui, sans-serif;
-    background: var(--bg);
+    background: var(--paper);
     color: var(--ink);
     overscroll-behavior: none;
     -webkit-user-select: none; user-select: none;
     touch-action: manipulation;
+    line-height: 1.5;
+  }
+  /* subtle paper grain */
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    opacity: .045; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   .app {
-    max-width: 560px;
-    margin: 0 auto;
-    padding: 14px 14px 40px;
+    position: relative; z-index: 1;
+    max-width: 500px; margin: 0 auto;
+    padding: 22px 18px 46px;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    display: flex; flex-direction: column;
   }
-  h1 {
-    text-align: center;
-    font-size: 28px;
-    margin: 6px 0 12px;
-    letter-spacing: 1px;
-    text-wrap: balance;
-  }
-  h1 .emoji { font-size: 30px; }
 
-  .btn {
-    border: none;
-    border-radius: 18px;
-    padding: 14px 18px;
-    font-size: 18px;
-    font-weight: 700;
-    font-family: inherit;
-    color: #fff;
-    background: var(--accent);
-    box-shadow: var(--shadow);
-    cursor: pointer;
-    transition: transform .05s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+  /* ---------- wordmark ---------- */
+  .brand { display: flex; align-items: center; gap: 12px; margin: 4px 2px 22px; }
+  .brand .mark {
+    width: 46px; height: 46px; flex: 0 0 auto;
+    border-radius: 13px; background: var(--surface);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--line);
+    display: grid; place-items: center;
   }
-  .btn:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,.12); }
-  .btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
-  .btn.blue { background: var(--accent2); }
-  .btn.green { background: var(--green); }
-  .btn.yellow { background: var(--yellow); color: var(--ink); }
-  .btn.ghost { background: #fff; color: var(--ink); box-shadow: 0 3px 0 rgba(0,0,0,.08); border: 2px solid #eee; }
-  .btn:disabled { opacity: .45; cursor: default; }
-  .btn.big { width: 100%; padding: 18px; font-size: 20px; }
+  .brand .mark svg { width: 26px; height: 26px; }
+  .brand .kicker {
+    font-size: 11px; letter-spacing: .28em; text-transform: none;
+    color: var(--muted); font-weight: 700; margin-bottom: 1px;
+  }
+  .brand h1 {
+    font-size: 25px; margin: 0; letter-spacing: .04em;
+    font-weight: 800; color: var(--ink); text-wrap: balance;
+  }
 
+  /* ---------- card ---------- */
   .card {
-    background: var(--card);
-    border-radius: 24px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
     padding: 18px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.06);
-    margin-bottom: 14px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 16px;
+  }
+  .step {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 13px; font-weight: 800; color: var(--ink-soft);
+    letter-spacing: .02em; margin: 0 2px 14px;
+  }
+  .step .no {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--ink); color: var(--surface);
+    display: grid; place-items: center; font-size: 12px; flex: 0 0 auto;
   }
   .hidden { display: none !important; }
 
-  .start-actions { display: flex; flex-direction: column; gap: 12px; }
-  .hint { text-align: center; font-size: 14px; color: var(--muted); margin-top: 6px; }
-  .section-title { font-size: 16px; font-weight: 700; margin: 4px 2px 10px; }
+  /* ---------- buttons ---------- */
+  .btn {
+    -webkit-appearance: none; appearance: none;
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    padding: 14px 18px;
+    font-size: 16px; font-weight: 800; font-family: inherit;
+    color: var(--ink); background: var(--surface);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .btn svg { width: 21px; height: 21px; flex: 0 0 auto; }
+  .btn:active { transform: translateY(1px); box-shadow: var(--shadow-sm); }
+  .btn:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+  .btn:disabled { opacity: .45; cursor: default; box-shadow: none; }
+  .btn.solid-teal {
+    background: var(--teal); color: #fff; border-color: transparent;
+    box-shadow: 0 2px 4px rgba(38,116,105,.30), 0 12px 24px rgba(38,116,105,.28);
+  }
+  .btn.solid-teal:active { box-shadow: 0 2px 4px rgba(38,116,105,.30); }
+  .btn.big { width: 100%; padding: 17px; font-size: 18px; }
+  .btn .ico-amber { color: var(--amber); }
+  .btn .ico-teal  { color: var(--teal); }
 
+  .photo-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ---------- photo frame ---------- */
+  .frame {
+    position: relative;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 10px 10px 12px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--line);
+    margin-bottom: 16px;
+  }
+  .frame .plate {
+    aspect-ratio: 1 / 1; width: 100%;
+    border-radius: 8px; overflow: hidden;
+    background: var(--surface-sunk);
+    box-shadow: inset 0 1px 3px rgba(51,48,44,.14);
+    display: grid; place-items: center;
+  }
+  .frame .plate img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .frame .empty { text-align: center; color: var(--muted); padding: 20px; }
+  .frame .empty svg { width: 40px; height: 40px; opacity: .5; margin-bottom: 8px; }
+  .frame .empty .t { font-size: 13px; font-weight: 700; }
+  .frame .cap { text-align: center; font-size: 11px; color: var(--muted); margin-top: 9px; letter-spacing: .02em; }
+
+  /* ---------- difficulty ---------- */
   .levels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
   .level {
-    border: 3px solid #eee;
-    background: #fff;
-    border-radius: 18px;
-    padding: 10px 4px;
-    text-align: center;
-    cursor: pointer;
-    transition: all .1s ease;
+    border: 1.5px solid var(--line); background: var(--surface);
+    border-radius: 15px; padding: 12px 6px 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    cursor: pointer; transition: border-color .14s, background .14s, transform .14s;
+    position: relative;
   }
-  .level:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-  .level .face { font-size: 26px; }
-  .level .name { font-size: 13px; font-weight: 700; margin-top: 2px; }
-  .level .grid { font-size: 11px; color: #b3a89b; }
-  .level.active { border-color: var(--accent); background: #fff2ee; transform: translateY(-2px); }
+  .level:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+  .level .grid-ico { width: 30px; height: 30px; }
+  .level .grid-ico rect { fill: var(--muted); transition: fill .14s; }
+  .level .lv-name { font-size: 11px; font-weight: 800; text-align: center; line-height: 1.25; color: var(--ink-soft); }
+  .level .lv-pieces { font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .level .tick {
+    position: absolute; top: 7px; right: 7px; width: 17px; height: 17px;
+    border-radius: 50%; display: none; place-items: center; color: #fff;
+  }
+  .level .tick svg { width: 11px; height: 11px; }
+  .level.active { transform: translateY(-2px); }
+  .level.active .lv-name { color: var(--ink); }
+  .level.active .tick { display: grid; }
 
-  .preview-wrap { text-align: center; }
-  .preview-wrap img {
-    max-width: 100%;
-    max-height: 240px;
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-  }
+  .hint { text-align: center; font-size: 13px; color: var(--muted); margin-top: 12px; }
 
-  .topbar {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 8px; margin-bottom: 12px;
+  /* ---------- game ---------- */
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+  .icon-btn {
+    -webkit-appearance: none; appearance: none;
+    border: 1px solid var(--line); background: var(--surface);
+    border-radius: 13px; padding: 10px 14px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: inherit; font-weight: 800; font-size: 14px; color: var(--ink);
+    box-shadow: var(--shadow-sm);
   }
-  .stats { display: flex; gap: 8px; }
+  .icon-btn svg { width: 19px; height: 19px; }
+  .icon-btn:active { transform: translateY(1px); }
+  .icon-btn:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+  .stats { display: flex; gap: 9px; }
   .stat {
-    background: #fff; border-radius: 14px; padding: 8px 12px;
-    font-weight: 700; font-size: 15px;
-    box-shadow: 0 3px 0 rgba(0,0,0,.06);
-    display: flex; align-items: center; gap: 5px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 8px 13px; font-weight: 800; font-size: 15px;
+    box-shadow: var(--shadow-sm);
+    display: flex; align-items: center; gap: 7px;
     font-variant-numeric: tabular-nums;
   }
-  .board-wrap { position: relative; }
+  .stat svg { width: 16px; height: 16px; color: var(--ink-soft); }
+
+  .tray {
+    background: var(--paper-2);
+    border-radius: 18px; padding: 10px;
+    box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.4);
+    border: 1px solid var(--line);
+  }
   .board {
-    display: grid; gap: 3px; width: 100%;
-    aspect-ratio: 1 / 1;
-    background: #e9dfce; border-radius: 16px; padding: 3px;
-    box-shadow: var(--shadow);
+    display: grid; gap: 4px; width: 100%; aspect-ratio: 1 / 1;
+    background: var(--surface-sunk);
+    border-radius: 10px; padding: 4px;
+    box-shadow: inset 0 1px 4px rgba(51,48,44,.18);
   }
   .tile {
-    background-size: cover; border-radius: 8px; cursor: grab;
-    position: relative;
-    transition: transform .08s ease, opacity .12s ease, outline-color .1s ease;
-    outline: 0px solid transparent;
-    background-color: #d9cdb8;
+    background-size: cover; border-radius: 6px; cursor: grab; position: relative;
+    transition: transform .1s ease, opacity .14s ease;
+    background-color: var(--paper-2);
     touch-action: none;
+    box-shadow: 0 1px 1px rgba(51,48,44,.12);
   }
-  .tile.dragging-src { opacity: .28; }
+  .tile.dragging-src { opacity: .25; }
   .tile.drop-target {
-    outline: 5px solid var(--accent2); outline-offset: -5px;
-    transform: scale(1.04); z-index: 2;
-  }
-  .tile-ghost {
-    position: fixed; z-index: 45; border-radius: 10px;
-    background-size: cover; pointer-events: none;
-    box-shadow: 0 10px 24px rgba(0,0,0,.35);
-    transform: scale(1.08); opacity: .96;
+    outline: 4px solid var(--berry); outline-offset: -4px;
+    transform: scale(1.03); z-index: 2;
   }
   .tile .num {
-    position: absolute; top: 3px; left: 3px;
-    background: rgba(0,0,0,.45); color: #fff;
-    font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 8px;
+    position: absolute; top: 4px; left: 4px;
+    background: rgba(51,48,44,.62); color: #fff;
+    font-size: 11px; font-weight: 800; padding: 1px 6px; border-radius: 7px;
+    font-variant-numeric: tabular-nums;
   }
   .board.hide-num .num { display: none; }
-
-  .controls { display: flex; gap: 10px; margin-top: 14px; }
-  .controls .btn { flex: 1; font-size: 16px; padding: 14px 8px; }
-
-  .ref-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,.6);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 50; padding: 20px;
+  .tile-ghost {
+    position: fixed; z-index: 60; border-radius: 8px;
+    background-size: cover; pointer-events: none;
+    box-shadow: var(--shadow-lg);
+    transform: rotate(-3deg) scale(1.08);
+    opacity: .97;
   }
-  .ref-overlay img { max-width: 100%; max-height: 80vh; border-radius: 16px; }
+
+  .controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+  .controls .btn { padding: 13px 6px; font-size: 14px; flex-direction: column; gap: 6px; }
+  .controls .btn svg { width: 22px; height: 22px; }
+
+  /* ---------- overlays ---------- */
+  .ref-overlay {
+    position: fixed; inset: 0; background: rgba(38,34,28,.66);
+    display: flex; align-items: center; justify-content: center; z-index: 70; padding: 24px;
+    backdrop-filter: blur(2px);
+  }
+  .ref-overlay .frame { max-width: 90%; margin: 0; }
+  .ref-overlay img { max-height: 74vh; border-radius: 8px; display: block; }
 
   .win {
-    position: fixed; inset: 0; background: rgba(255,248,230,.94);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 14px; z-index: 60; padding: 24px; text-align: center;
+    position: fixed; inset: 0; z-index: 80;
+    background: var(--paper);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; padding: 28px; text-align: center;
   }
-  .win h2 { font-size: 40px; margin: 0; }
-  .win .big-emoji { font-size: 72px; animation: pop .5s ease; }
-  .win img { max-width: 80%; max-height: 46vh; border-radius: 16px; box-shadow: var(--shadow); }
-  .win .stats-line { font-size: 18px; font-weight: 700; }
-  @keyframes pop { 0%{transform:scale(0)} 70%{transform:scale(1.25)} 100%{transform:scale(1)} }
+  .win::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    opacity: .05; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .win > * { position: relative; z-index: 1; }
+  .win .badge {
+    font-size: 12px; font-weight: 800; letter-spacing: .22em;
+    color: var(--teal); animation: rise .5s ease both;
+  }
+  .win h2 { font-size: 34px; margin: 0; letter-spacing: .04em; animation: rise .5s .05s ease both; }
+  .win .frame { max-width: 82%; margin: 4px 0 2px; animation: pop .55s .1s cubic-bezier(.2,1.3,.4,1) both; }
+  .win img { border-radius: 8px; display: block; width: 100%; }
+  .win .stats-line {
+    font-size: 15px; font-weight: 800; color: var(--ink-soft);
+    display: inline-flex; gap: 16px; align-items: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .win .stats-line span { display: inline-flex; align-items: center; gap: 6px; }
+  .win .stats-line svg { width: 17px; height: 17px; color: var(--muted); }
+  .win .win-actions { display: flex; flex-direction: column; gap: 11px; width: 100%; max-width: 300px; margin-top: 4px; }
+  @keyframes pop { 0%{transform:scale(.7); opacity:0} 100%{transform:scale(1); opacity:1} }
+  @keyframes rise { 0%{transform:translateY(10px); opacity:0} 100%{transform:translateY(0); opacity:1} }
 
-  .confetti { position: fixed; top: -10px; width: 10px; height: 14px; z-index: 61; border-radius: 2px; }
-  @keyframes fall { to { transform: translateY(110vh) rotate(540deg); opacity: 1; } }
+  .confetti { position: fixed; top: -12px; width: 9px; height: 13px; z-index: 81; border-radius: 2px; }
+  @keyframes fall { to { transform: translateY(112vh) rotate(600deg); } }
 
-  .footer-note { text-align: center; font-size: 12px; color: #b3a89b; margin-top: auto; padding-top: 16px; }
+  .footer-note {
+    text-align: center; font-size: 11px; color: var(--muted);
+    margin-top: auto; padding-top: 22px; display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .footer-note svg { width: 13px; height: 13px; }
 
   @media (prefers-reduced-motion: reduce) {
     * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
@@ -179,69 +280,131 @@
 </style>
 
 <div class="app">
-  <h1><span class="emoji">🧩</span> しゃしんパズル</h1>
 
+  <div class="brand">
+    <div class="mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#2f8f83" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="4"/>
+        <path d="M14 3v3a2 2 0 0 0 4 0v-.3" stroke="#f0a92b"/>
+        <path d="M3 14h3a2 2 0 0 1 0 4H5.7" stroke="#f0a92b"/>
+        <circle cx="15" cy="15" r="2.2" stroke="#d8567a"/>
+      </svg>
+    </div>
+    <div>
+      <div class="kicker">こどもの あそび</div>
+      <h1>しゃしんパズル</h1>
+    </div>
+  </div>
+
+  <!-- ========== START SCREEN ========== -->
   <div id="startScreen">
     <div class="card">
-      <div class="section-title">1. しゃしんを えらぶ</div>
-      <div class="start-actions">
-        <button class="btn big" id="cameraBtn">📷 カメラで とる</button>
-        <button class="btn big blue" id="galleryBtn">🖼️ しゃしんを えらぶ</button>
+      <div class="step"><span class="no">1</span> しゃしんを えらぶ</div>
+
+      <div class="frame">
+        <div class="plate">
+          <div class="empty" id="emptyState">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5" width="18" height="15" rx="3"/><circle cx="8.5" cy="10.5" r="1.8"/>
+              <path d="M4 18l5-5a2 2 0 0 1 2.8 0L20 20"/>
+            </svg>
+            <div class="t">ここに しゃしんが でます</div>
+          </div>
+          <img id="previewImg" class="hidden" alt="えらんだ しゃしん">
+        </div>
+        <div class="cap">しゃしんは この たんまつの なかだけで つかいます</div>
       </div>
-      <div class="preview-wrap hidden" id="previewWrap" style="margin-top:14px;">
-        <img id="previewImg" alt="えらんだ しゃしん">
+
+      <div class="photo-actions">
+        <button class="btn" id="cameraBtn">
+          <span class="ico-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6H7l1-2h8l1 2h1.5A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/><circle cx="12" cy="13" r="3.4"/></svg></span>
+          カメラ
+        </button>
+        <button class="btn" id="galleryBtn">
+          <span class="ico-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="M4 17l4.5-4.5a2 2 0 0 1 2.8 0L20 20"/></svg></span>
+          えらぶ
+        </button>
       </div>
-      <div class="hint">しゃしんは このタブレット／スマホの なかだけで つかいます</div>
     </div>
 
     <div class="card">
-      <div class="section-title">2. むずかしさ を えらぶ</div>
-      <div class="levels" id="levels">
-        <div class="level" data-n="2" tabindex="0"><div class="face">😊</div><div class="name">とても<br>かんたん</div><div class="grid">2×2</div></div>
-        <div class="level active" data-n="3" tabindex="0"><div class="face">🙂</div><div class="name">かんたん</div><div class="grid">3×3</div></div>
-        <div class="level" data-n="4" tabindex="0"><div class="face">😃</div><div class="name">ふつう</div><div class="grid">4×4</div></div>
-        <div class="level" data-n="5" tabindex="0"><div class="face">😎</div><div class="name">むずかしい</div><div class="grid">5×5</div></div>
-      </div>
+      <div class="step"><span class="no">2</span> むずかしさ を えらぶ</div>
+      <div class="levels" id="levels"></div>
     </div>
 
-    <button class="btn big green" id="startBtn" disabled>▶️ スタート！</button>
+    <button class="btn big solid-teal" id="startBtn" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5l12 7-12 7z"/></svg>
+      スタート
+    </button>
     <div class="hint" id="startHint">さきに しゃしんを えらんでね</div>
   </div>
 
+  <!-- ========== GAME SCREEN ========== -->
   <div id="gameScreen" class="hidden">
     <div class="topbar">
-      <button class="btn ghost" id="backBtn" style="padding:10px 14px;font-size:15px;">← もどる</button>
+      <button class="icon-btn" id="backBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        もどる
+      </button>
       <div class="stats">
-        <div class="stat">👆 <span id="moves">0</span></div>
-        <div class="stat">⏱️ <span id="timer">0:00</span></div>
+        <div class="stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v5"/><path d="M13 7a2 2 0 0 1 4 0v6a6 6 0 0 1-6 6h-1a5 5 0 0 1-4-2l-3-4 2-1 3 2"/></svg>
+          <span id="moves">0</span>
+        </div>
+        <div class="stat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>
+          <span id="timer">0:00</span>
+        </div>
       </div>
     </div>
 
-    <div class="board-wrap">
+    <div class="tray">
       <div class="board" id="board"></div>
     </div>
 
     <div class="controls">
-      <button class="btn yellow" id="hintBtn">👀 おてほん</button>
-      <button class="btn blue" id="numBtn">🔢 ばんごう</button>
-      <button class="btn" id="shuffleBtn">🔀 まぜる</button>
+      <button class="btn" id="hintBtn">
+        <span class="ico-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.7"/></svg></span>
+        おてほん
+      </button>
+      <button class="btn" id="numBtn">
+        <span class="ico-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9h14M5 15h14M9.5 4L8 20M16 4l-1.5 16"/></svg></span>
+        ばんごう
+      </button>
+      <button class="btn" id="shuffleBtn">
+        <span style="color:var(--berry)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h4v4M4 20l16-16M4 4l5 5M20 16v4h-4M15 15l5 5"/></svg></span>
+        まぜる
+      </button>
     </div>
   </div>
 
-  <div class="footer-note">がぞうは たんまつの そとに おくられません 🔒</div>
+  <div class="footer-note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+    がぞうは たんまつの そとに おくられません
+  </div>
 </div>
 
+<!-- reference overlay -->
 <div class="ref-overlay hidden" id="refOverlay">
-  <img id="refImg" alt="おてほん">
+  <div class="frame"><div class="plate"><img id="refImg" alt="おてほん"></div></div>
 </div>
 
+<!-- win overlay -->
 <div class="win hidden" id="winOverlay">
-  <div class="big-emoji">🎉</div>
-  <h2>できた！</h2>
-  <img id="winImg" alt="かんせい">
+  <div class="badge">かんせい</div>
+  <h2>やったね！</h2>
+  <div class="frame"><div class="plate"><img id="winImg" alt="かんせい した しゃしん"></div></div>
   <div class="stats-line" id="winStats"></div>
-  <button class="btn big green" id="playAgainBtn" style="max-width:280px;">🔁 もういちど</button>
-  <button class="btn ghost" id="newPhotoBtn" style="max-width:280px;">🖼️ べつの しゃしんで</button>
+  <div class="win-actions">
+    <button class="btn big solid-teal" id="playAgainBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 1 2.3 5.6M4 20v-4h4"/></svg>
+      もういちど
+    </button>
+    <button class="btn" id="newPhotoBtn">
+      <span class="ico-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="M4 17l4.5-4.5a2 2 0 0 1 2.8 0L20 20"/></svg></span>
+      べつの しゃしんで
+    </button>
+  </div>
 </div>
 
 <input type="file" accept="image/*" capture="environment" id="cameraInput" class="hidden">
@@ -250,15 +413,59 @@
 <script>
 (function () {
   "use strict";
+
+  var LEVELS = [
+    { n: 2, name: "とても<br>かんたん", tone: "#8ba86a" },
+    { n: 3, name: "かんたん",           tone: "#2f8f83" },
+    { n: 4, name: "ふつう",             tone: "#f0a92b" },
+    { n: 5, name: "むずかしい",         tone: "#d8567a" }
+  ];
+
   var state = {
-    imgDataUrl: null, n: 3, order: [], selected: null,
+    imgDataUrl: null, n: 3, order: [],
     moves: 0, startTime: 0, timerId: null, showNum: false, finished: false
   };
+
   var $ = function (id) { return document.getElementById(id); };
   var startScreen = $("startScreen");
   var gameScreen  = $("gameScreen");
   var board       = $("board");
 
+  // ---------- build difficulty picker ----------
+  var levelsEl = $("levels");
+  function gridIcon(n, tone) {
+    var cell = 30 / n, pad = Math.max(0.6, cell * 0.14), r = Math.min(1.4, cell * 0.22);
+    var rects = "";
+    for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) {
+      rects += "<rect x='" + (x*cell+pad) + "' y='" + (y*cell+pad) + "' width='" + (cell-pad*2) +
+               "' height='" + (cell-pad*2) + "' rx='" + r + "' style='fill:" + tone + "'/>";
+    }
+    return "<svg class='grid-ico' viewBox='0 0 30 30'>" + rects + "</svg>";
+  }
+  LEVELS.forEach(function (lv, i) {
+    var el = document.createElement("div");
+    el.className = "level" + (lv.n === state.n ? " active" : "");
+    el.setAttribute("data-n", lv.n);
+    el.setAttribute("tabindex", "0");
+    el.setAttribute("role", "button");
+    el.innerHTML =
+      gridIcon(lv.n, lv.tone) +
+      "<div class='lv-name'>" + lv.name + "</div>" +
+      "<div class='lv-pieces'>" + (lv.n * lv.n) + " ピース</div>" +
+      "<div class='tick' style='background:" + lv.tone + "'><svg viewBox='0 0 24 24' fill='none' stroke='#fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 12.5l5 5 11-11'/></svg></div>";
+    function pick() {
+      levelsEl.querySelectorAll(".level").forEach(function (x) { x.classList.remove("active"); });
+      el.classList.add("active");
+      state.n = lv.n;
+    }
+    el.addEventListener("click", pick);
+    el.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); }
+    });
+    levelsEl.appendChild(el);
+  });
+
+  // ---------- image loading & square crop ----------
   function loadFile(file) {
     if (!file) return;
     var reader = new FileReader();
@@ -266,7 +473,8 @@
       cropToSquare(e.target.result, function (squareUrl) {
         state.imgDataUrl = squareUrl;
         $("previewImg").src = squareUrl;
-        $("previewWrap").classList.remove("hidden");
+        $("previewImg").classList.remove("hidden");
+        $("emptyState").classList.add("hidden");
         updateStartButton();
       });
     };
@@ -280,8 +488,7 @@
       var canvas = document.createElement("canvas");
       canvas.width = size; canvas.height = size;
       var ctx = canvas.getContext("2d");
-      var sx = (img.width - side) / 2, sy = (img.height - side) / 2;
-      ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
+      ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
       cb(canvas.toDataURL("image/jpeg", 0.9));
     };
     img.src = dataUrl;
@@ -292,24 +499,13 @@
     $("startHint").style.display = ready ? "none" : "block";
   }
 
-  var levels = $("levels");
-  function selectLevel(el) {
-    levels.querySelectorAll(".level").forEach(function (x) { x.classList.remove("active"); });
-    el.classList.add("active");
-    state.n = parseInt(el.getAttribute("data-n"), 10);
-  }
-  Array.prototype.forEach.call(levels.querySelectorAll(".level"), function (el) {
-    el.addEventListener("click", function () { selectLevel(el); });
-    el.addEventListener("keydown", function (e) {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectLevel(el); }
-    });
-  });
-
+  // ---------- file inputs ----------
   $("cameraBtn").addEventListener("click", function () { $("cameraInput").click(); });
   $("galleryBtn").addEventListener("click", function () { $("galleryInput").click(); });
   $("cameraInput").addEventListener("change", function (e) { loadFile(e.target.files[0]); this.value = ""; });
   $("galleryInput").addEventListener("change", function (e) { loadFile(e.target.files[0]); this.value = ""; });
 
+  // ---------- navigation ----------
   $("startBtn").addEventListener("click", startGame);
   $("backBtn").addEventListener("click", goToStart);
   $("playAgainBtn").addEventListener("click", function () { hideWin(); startGame(); });
@@ -325,7 +521,6 @@
     state.showNum = false;
     board.classList.add("hide-num");
     state.finished = false;
-    state.selected = null;
     state.order = [];
     for (var i = 0; i < n * n; i++) state.order.push(i);
     shuffleOrder();
@@ -344,6 +539,8 @@
       }
     } while (isSolved());
   }
+
+  // ---------- board ----------
   function buildBoard() {
     var n = state.n;
     board.style.gridTemplateColumns = "repeat(" + n + ", 1fr)";
@@ -368,14 +565,13 @@
       var el = tiles[pos];
       el.style.backgroundImage = "url(" + state.imgDataUrl + ")";
       el.style.backgroundSize = (n * 100) + "% " + (n * 100) + "%";
-      var px = n === 1 ? 0 : (col / (n - 1)) * 100;
-      var py = n === 1 ? 0 : (row / (n - 1)) * 100;
-      el.style.backgroundPosition = px + "% " + py + "%";
+      el.style.backgroundPosition = (n === 1 ? 0 : (col / (n - 1)) * 100) + "% " +
+                                    (n === 1 ? 0 : (row / (n - 1)) * 100) + "%";
       el.querySelector(".num").textContent = (orig + 1);
     }
   }
 
-  // drag-and-drop (pointer events: touch + mouse)
+  // ---------- drag and drop (pointer events) ----------
   var drag = null;
   board.addEventListener("pointerdown", function (e) {
     if (state.finished || drag) return;
@@ -432,10 +628,13 @@
   }
   board.addEventListener("pointerup", endDrag);
   board.addEventListener("pointercancel", endDrag);
+
   function isSolved() {
     for (var i = 0; i < state.order.length; i++) { if (state.order[i] !== i) return false; }
     return true;
   }
+
+  // ---------- timer ----------
   function startTimer() {
     stopTimer();
     state.startTime = Date.now();
@@ -448,6 +647,7 @@
   }
   function stopTimer() { if (state.timerId) { clearInterval(state.timerId); state.timerId = null; } }
 
+  // ---------- controls ----------
   var refOverlay = $("refOverlay");
   $("hintBtn").addEventListener("click", function () {
     $("refImg").src = state.imgDataUrl;
@@ -461,40 +661,42 @@
   $("shuffleBtn").addEventListener("click", function () {
     if (state.finished) return;
     shuffleOrder();
-    state.selected = null;
     state.moves = 0;
     $("moves").textContent = "0";
     startTimer();
     renderTiles();
   });
 
+  // ---------- win ----------
   function win() {
     state.finished = true;
     stopTimer();
     var el = $("timer").textContent;
     $("winImg").src = state.imgDataUrl;
-    $("winStats").textContent = "👆 " + state.moves + "かい ・ ⏱️ " + el;
+    $("winStats").innerHTML =
+      "<span><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 11V6a2 2 0 0 1 4 0v5'/><path d='M13 7a2 2 0 0 1 4 0v6a6 6 0 0 1-6 6h-1a5 5 0 0 1-4-2l-3-4 2-1 3 2'/></svg>" + state.moves + " かい</span>" +
+      "<span><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='13' r='8'/><path d='M12 9v4l2.5 2M9 2h6'/></svg>" + el + "</span>";
     $("winOverlay").classList.remove("hidden");
     launchConfetti();
   }
   function hideWin() { $("winOverlay").classList.add("hidden"); }
   function launchConfetti() {
-    var colors = ["#ff7a59", "#4ac0ff", "#ffd54a", "#57cc66", "#c77dff"];
-    for (var i = 0; i < 40; i++) {
+    var colors = ["#f0a92b", "#2f8f83", "#d8567a", "#8ba86a", "#33302c"];
+    for (var i = 0; i < 44; i++) {
       (function () {
         var c = document.createElement("div");
         c.className = "confetti";
         c.style.left = Math.random() * 100 + "vw";
         c.style.background = colors[Math.floor(Math.random() * colors.length)];
-        var dur = 1.5 + Math.random() * 1.5;
+        var dur = 1.6 + Math.random() * 1.6;
         c.style.animation = "fall " + dur + "s linear forwards";
         c.style.animationDelay = (Math.random() * 0.6) + "s";
-        c.style.opacity = "0";
         document.body.appendChild(c);
         setTimeout(function () { c.remove(); }, (dur + 1) * 1000);
       })();
     }
   }
+
   updateStartButton();
 })();
 </script>
