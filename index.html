@@ -140,17 +140,29 @@
   .tile {
     background-size: cover;
     border-radius: 8px;
-    cursor: pointer;
+    cursor: grab;
     position: relative;
-    transition: transform .08s ease, outline-color .1s ease;
+    transition: transform .08s ease, opacity .12s ease, outline-color .1s ease;
     outline: 0px solid transparent;
     background-color: #d9cdb8;
+    touch-action: none;
   }
-  .tile.selected {
-    outline: 4px solid var(--accent);
-    outline-offset: -4px;
-    transform: scale(.94);
+  .tile.dragging-src { opacity: .28; }
+  .tile.drop-target {
+    outline: 5px solid var(--accent2);
+    outline-offset: -5px;
+    transform: scale(1.04);
     z-index: 2;
+  }
+  .tile-ghost {
+    position: fixed;
+    z-index: 45;
+    border-radius: 10px;
+    background-size: cover;
+    pointer-events: none;
+    box-shadow: 0 10px 24px rgba(0,0,0,.35);
+    transform: scale(1.08);
+    opacity: .96;
   }
   .tile .num {
     position: absolute;
@@ -423,34 +435,69 @@
       var py = n === 1 ? 0 : (row / (n - 1)) * 100;
       el.style.backgroundPosition = px + "% " + py + "%";
       el.querySelector(".num").textContent = (orig + 1);
-      el.classList.toggle("selected", state.selected === pos);
     }
   }
 
-  // ---- tap-to-swap interaction ----
-  board.addEventListener("click", function (e) {
-    if (state.finished) return;
+  // ---- drag-and-drop interaction (pointer events: touch + mouse) ----
+  var drag = null;
+
+  board.addEventListener("pointerdown", function (e) {
+    if (state.finished || drag) return;
     var tile = e.target.closest(".tile");
     if (!tile) return;
-    var pos = parseInt(tile.getAttribute("data-pos"), 10);
+    e.preventDefault();
+    var rect = tile.getBoundingClientRect();
+    var ghost = document.createElement("div");
+    ghost.className = "tile-ghost";
+    ghost.style.width = rect.width + "px";
+    ghost.style.height = rect.height + "px";
+    ghost.style.backgroundImage = tile.style.backgroundImage;
+    ghost.style.backgroundSize = tile.style.backgroundSize;
+    ghost.style.backgroundPosition = tile.style.backgroundPosition;
+    ghost.style.left = rect.left + "px";
+    ghost.style.top = rect.top + "px";
+    document.body.appendChild(ghost);
+    tile.classList.add("dragging-src");
+    drag = {
+      pos: parseInt(tile.getAttribute("data-pos"), 10),
+      ghost: ghost, srcTile: tile, target: null,
+      offX: e.clientX - rect.left, offY: e.clientY - rect.top
+    };
+    try { board.setPointerCapture(e.pointerId); } catch (err) {}
+  });
 
-    if (state.selected === null) {
-      state.selected = pos;
-      renderTiles();
-    } else if (state.selected === pos) {
-      state.selected = null; // deselect
-      renderTiles();
-    } else {
-      // swap
-      var a = state.selected, b = pos;
-      var t = state.order[a]; state.order[a] = state.order[b]; state.order[b] = t;
-      state.selected = null;
+  board.addEventListener("pointermove", function (e) {
+    if (!drag) return;
+    e.preventDefault();
+    drag.ghost.style.left = (e.clientX - drag.offX) + "px";
+    drag.ghost.style.top = (e.clientY - drag.offY) + "px";
+    drag.ghost.style.display = "none";
+    var under = document.elementFromPoint(e.clientX, e.clientY);
+    drag.ghost.style.display = "";
+    var t = (under && under.closest) ? under.closest(".tile") : null;
+    if (drag.target && drag.target !== t) drag.target.classList.remove("drop-target");
+    if (t && t !== drag.srcTile) { t.classList.add("drop-target"); drag.target = t; }
+    else { drag.target = null; }
+  });
+
+  function endDrag() {
+    if (!drag) return;
+    var t = drag.target;
+    if (t && t !== drag.srcTile) {
+      var a = drag.pos, b = parseInt(t.getAttribute("data-pos"), 10);
+      var tmp = state.order[a]; state.order[a] = state.order[b]; state.order[b] = tmp;
       state.moves++;
       $("moves").textContent = state.moves;
+      t.classList.remove("drop-target");
       renderTiles();
-      if (isSolved()) win();
     }
-  });
+    drag.srcTile.classList.remove("dragging-src");
+    drag.ghost.remove();
+    drag = null;
+    if (isSolved()) win();
+  }
+  board.addEventListener("pointerup", endDrag);
+  board.addEventListener("pointercancel", endDrag);
 
   function isSolved() {
     for (var i = 0; i < state.order.length; i++) {
