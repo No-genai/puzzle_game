@@ -188,12 +188,14 @@
     border-radius: 18px; padding: 10px;
     box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.4);
     border: 1px solid var(--line);
+    touch-action: none;
   }
   .board {
     display: grid; gap: 4px; width: 100%; aspect-ratio: 1 / 1;
     background: var(--surface-sunk);
     border-radius: 10px; padding: 4px;
     box-shadow: inset 0 1px 4px rgba(51,48,44,.18);
+    touch-action: none;
   }
   .tile {
     background-size: cover; border-radius: 6px; cursor: grab; position: relative;
@@ -202,6 +204,7 @@
     touch-action: none;
     box-shadow: 0 1px 1px rgba(51,48,44,.12);
   }
+  .tile .num { touch-action: none; }
   .tile.dragging-src { opacity: .25; }
   .tile.drop-target {
     outline: 4px solid var(--berry); outline-offset: -4px;
@@ -628,6 +631,10 @@
   }
   board.addEventListener("pointerup", endDrag);
   board.addEventListener("pointercancel", endDrag);
+  // stop the page from scrolling while a tile is being dragged (iOS Safari)
+  board.addEventListener("touchmove", function (e) {
+    if (drag) e.preventDefault();
+  }, { passive: false });
 
   function isSolved() {
     for (var i = 0; i < state.order.length; i++) { if (state.order[i] !== i) return false; }
